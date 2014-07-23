@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8"/>
+<html>
+<head>
+    <title>hello wolrd!</title>
+    <style type="text/css"></style>
+</head>
+<script type="application/javascript">
+
+
+    /*
+
+    // test for override
+     var x = alert;
+     alert = function() {
+     console.log(arguments);
+     x.apply(this,arguments);
+     };
+
+     alert("foo" ,"bar" ,"baz");
+     */
+
+    var log = function () {
+        console.log(arguments);
+    };
+
+
+    var z = {};
+
+    var handler = {
+
+        api: 'http:/example:8080/api',
+
+        get: function (object, property, receiver) {
+
+            if (property in object) {
+                return object[property];
+            }
+
+            this.api = this.api + '/';
+
+
+            /*
+            nope. this is stupid
+            //what if object has 'GET' property?
+            // __ is ugly
+            if (property === '__POST' || property === '__GET' || property === '__PUT' || property === '__DELETE') {
+                return function () {
+                    //ajax settings, content type, query arguments, headers, data
+                    return property + ' / ' + handler.api + arguments;
+                };
+            }
+            */
+
+            this.api = this.api + property;
+
+            //magic lies here
+            return new Proxy(object, handler);
+        }
+    };
+
+
+    var rest = new Proxy(z, handler);
+
+    var piston = {
+        "name": "new piston",
+        "color": "metallic"
+    }
+    //console.log(rest.car);
+    console.log(rest.cars[1].tires);
+    console.log(rest.cars[1].tires[0]);
+    console.log(rest.cars[1].motor.valve);
+    console.log(rest.cars[1].motor.piston[1].__PUT(piston, "blaa"));
+
+    //perhaps this whole fuction call stuff is evil. I should implement setters..
+    //and delete
+    //yes.
+
+    console.log(rest.cars[1].motor.piston[1] = piston);
+
+
+
+</script>
+<body>
+
+
+</body>
+</html>
